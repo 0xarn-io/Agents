@@ -22,15 +22,21 @@ jobs:
     defaults:
       run:
         working-directory: source
+        shell: bash
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
       - name: Unit and contract tests
-        run: python -m unittest discover -s .agents/tests -p "test_*.py" -v
+        run: |
+          set -o pipefail
+          python -c "import shutil, sys; print(sys.version); print('bash:', shutil.which('bash'))"
+          python -m unittest discover -s .agents/tests -p "test_*.py" -v 2>&1 | tee test-output.txt
+      - name: Report failing tests as annotations
+        if: failure()
+        run: python ../.github/scripts/annotate_failures.py test-output.txt
       - name: AGENT_CONTEXT.md is up to date
-        shell: bash
         run: |
           python .agents/tools/export_context.py --output .agents/AGENT_CONTEXT.md
           git diff --exit-code -- .agents/AGENT_CONTEXT.md
