@@ -94,8 +94,3 @@ three signed off "good for all". The rounds are recorded in
 scenarios in [`tests/BEHAVIORAL_EVALS.md`](source/.agents/tests/BEHAVIORAL_EVALS.md) still
 need running in each host.
 
-## License
-
-[MIT](LICENSE). The `super-code` reference library is derived from "superpowers", and its
-upstream revision and license were not included with the source material. Read
-[`PROVENANCE.md`](source/.agents/PROVENANCE.md) before you redistribute it.
