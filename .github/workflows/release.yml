@@ -28,10 +28,9 @@ jobs:
           cat >> notes.md <<'MD'
 
           ## Install
-          Unzip into your project root: it contains `AGENTS.md`, `CLAUDE.md`, and `.agents/`.
-          Merge rather than overwrite existing `AGENTS.md`/`CLAUDE.md`. Per-host steps are in
-          `.agents/README.md`; Grok Build users should copy the wrappers from
-          `.agents/adapters/grok-build/` into `.grok/skills/`.
+          Unzip into your project root: it contains `AGENTS.md`, `CLAUDE.md`, `.agents/`, and
+          `.grok/`. Merge rather than overwrite existing files. Per-host steps are in
+          `.agents/README.md`.
           MD
       - name: Publish
         env:

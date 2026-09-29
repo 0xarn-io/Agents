@@ -1,0 +1,20 @@
+# Project rules for Grok Build (merged with your ~/.grok/config.toml; deny > ask > allow).
+# The bundle's AGENT_RULES.md says history and publishing actions need the user's go-ahead.
+# These `ask` rules make Grok Build enforce that for every skill and subagent, including its
+# built-in plan executor, which otherwise commits, creates worktrees, and pushes on its own.
+[permission]
+ask = [
+  "Bash(git commit*)",
+  "Bash(git push*)",
+  "Bash(git merge*)",
+  "Bash(git rebase*)",
+  "Bash(git reset --hard*)",
+  "Bash(git stash*)",
+  "Bash(git checkout*)",
+  "Bash(git restore*)",
+  "Bash(git clean*)",
+  "Bash(git worktree add*)",
+  "Bash(gh pr create*)",
+  "Bash(gt create*)",
+  "Bash(gt submit*)",
+]

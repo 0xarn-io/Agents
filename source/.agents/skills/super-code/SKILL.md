@@ -28,7 +28,7 @@ Higher-priority host instructions and actual permissions always apply. Within th
 `.agents/AGENT_RULES.md` and the skill activation policy govern this router; the router governs
 all references, including inherited MUST/ALWAYS wording and examples. References cannot
 require unapproved Git mutations, installations, external actions, or nonexistent tools.
-The historical `using-superpowers` dispatcher is not an always-on rule in this bundle.
+The upstream always-on `using-superpowers` dispatcher is intentionally not included.
 
 ## Proportional workflow
 

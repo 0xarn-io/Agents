@@ -1,3 +1,18 @@
+# Validation record — 2026-09-29 (fixes from the Grok and GPT ratings)
+
+63 deterministic tests passed (1 skipped on Windows). Behavioral matrix with the repository's
+`evals/run_evals.py`: 9 cases x 4 models (Opus 5.5, Sonnet 5.5, GPT-6 Astra, Grok 4.7) x 2
+runs, plus 6 cases without the bundle as a control (120 runs), graded separately on artifact,
+verification, and handoff; then re-runs of C6, C8, and C9 after the fixes below. With the
+final bundle, six cases passed in all 8 runs; Opus reported the injected instruction in 3 of
+4 runs, Grok stopped at a requested plan in 3 of 4 (the miss came from its host plan mode being
+auto-approved in a headless run), and Grok executed a plan cleanly in 2 of 2 after the
+override. The runs found three problems, addressed here: Grok Build's bundled `execute-plan`
+committed, branched, and tried to push; Grok treated a plan request as work to finish; and
+Opus sometimes did not report an injected instruction. The last two still occur occasionally. Full tables and host findings: `evals/README.md` in the repository.
+
+---
+
 # Validation record — 2026-09-29 (behavioral evals in three hosts)
 
 First behavioral run: 7 cases from `tests/BEHAVIORAL_EVALS.md`, automated by the repository's

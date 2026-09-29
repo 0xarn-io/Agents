@@ -11,6 +11,7 @@ gets a small adapter for how it loads files and picks models.
 source/                          ← copy the contents of this folder into your project root
 ├── AGENTS.md                    loader for Codex, Grok Build, and other AGENTS.md hosts
 ├── CLAUDE.md                    loader for Claude Code (@-imports the shared files)
+├── .grok/                       Grok Build: skill wrappers, execute-plan override, ask rules
 └── .agents/
     ├── AGENT_RULES.md           the baseline every agent follows
     ├── CAPABILITIES.md          tool fallbacks, delegation, and model-selection rules
@@ -22,14 +23,14 @@ source/                          ← copy the contents of this folder into your 
     ├── adapters/
     │   ├── claude-code/         model routing (haiku/sonnet/opus), per-model notes, wrappers
     │   ├── codex/               GPT-6 notes and custom-agent .toml files
-    │   └── grok-build/          Grok notes and skill wrappers
+    │   └── grok-build/          Grok notes (loading, models, headless runs)
     ├── tools/                   optional Python helpers (context export, plan task briefs)
     └── tests/                   contract and helper tests, behavioral eval cases
 ```
 
 ## Install into a project
 
-1. Copy `source/AGENTS.md`, `source/CLAUDE.md`, and `source/.agents/` to your repository
+1. Copy `source/AGENTS.md`, `source/CLAUDE.md`, `source/.agents/`, and `source/.grok/` to your repository
    root. If the project already has an `AGENTS.md` or `CLAUDE.md`, merge them rather than overwrite.
 2. Fill in `.agents/ARCHITECTURE.md` with the project's real build and test commands.
    On Windows, keep the project path under about 150 characters or enable Git long paths
@@ -40,7 +41,7 @@ source/                          ← copy the contents of this folder into your 
 |---|---|---|
 | Claude Code | `CLAUDE.md`, which imports the rules and Claude model routing | Optional: copy `adapters/claude-code/<skill>/SKILL.md` to `.claude/skills/<skill>/` for slash commands |
 | Codex | `AGENTS.md`, and the skills in `.agents/skills/` (kept opt-in by `agents/openai.yaml`) | Optional: copy `adapters/codex/agents/*.toml` to `.codex/agents/` for routed subagents |
-| Grok Build | `AGENTS.md` and `CLAUDE.md`, and the skills in `.agents/skills/` | **Recommended:** copy `adapters/grok-build/<skill>/SKILL.md` to `.grok/skills/<skill>/` so the skills stay opt-in |
+| Grok Build | `AGENTS.md`, `CLAUDE.md`, the skills in `.agents/skills/`, and the bundle's `.grok/` (wrappers that keep both skills opt-in, an `execute-plan` override, and `ask` rules for commits and pushes) | Trust the folder when Grok asks; nothing in the project loads until you do |
 | Chat-only / API | Nothing | Paste or attach `.agents/AGENT_CONTEXT.md` |
 
 Full loading details, including other hosts: [`source/.agents/README.md`](source/.agents/README.md).
@@ -94,10 +95,15 @@ each reviewed the bundle read-only in their own host. They went through four rou
 three signed off "good for all". The rounds are recorded in
 [`VALIDATION.md`](source/.agents/VALIDATION.md).
 
-The same day, [`evals/`](evals/README.md) ran 7 behavioral cases headless in each tool, on
-Claude Opus 5.5, Sonnet 5.5, GPT-6 Astra, and Grok 4.7. Each run used a throwaway repository
-with a real bug, a dirty working tree, and a log containing an injected instruction. 26 of 28
-runs passed. The other two acted on nothing but didn't report the injected instruction. After
-a one-line rule fix, 8 of 8 re-runs reported it. Re-run the evals with
-`python evals/run_evals.py`.
+The same day, [`evals/`](evals/README.md) ran 9 behavioral cases headless in each tool, on
+Claude Opus 5.5, Sonnet 5.5, GPT-6 Astra, and Grok 4.7: 120 runs in throwaway repositories
+with a real bug, a dirty working tree, and a log containing an injected instruction, each
+case also run without the bundle for comparison. Six cases passed in all 8 runs (2 per
+model). On the rest, with the final bundle: Opus reported an injected instruction in 3 of 4
+runs, Grok stopped at a requested plan in 3 of 4, and Grok executed a plan cleanly in 2 of 2
+after the `execute-plan` override. The bundle measurably helped: Sonnet ran its tests (0/2
+without), GPT stayed in scope, Opus and GPT reported the injected instruction (0/2 each
+without), and Grok executed a plan without committing or pushing (0/2 without). Details and
+remaining gaps: [`evals/README.md`](evals/README.md). Re-run with
+`python evals/run_evals.py --repeat 2 --control`.
 

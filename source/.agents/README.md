@@ -7,8 +7,8 @@ No filename guarantees automatic loading or identical compliance in every applic
 
 ## Install without overwriting project instructions
 
-Extract the archive into a staging directory first. Review/merge `.agents/` into the target
-repository, preserving any project-specific changes. Put the supplied `AGENTS.md` at the
+Extract the archive into a staging directory first. Review/merge `.agents/` and `.grok/` into
+the target repository, preserving any project-specific changes. Put the supplied `AGENTS.md` at the
 repository root, not only inside `.agents/`. If a root `AGENTS.md` already exists, merge its
 loader instructions rather than replacing the project's rules. Do the same for `CLAUDE.md`.
 The supplied ZIP contains relative paths and no symlinks or package-install hooks.
@@ -26,7 +26,7 @@ Keep the whole `.agents` directory for shared helper paths to resolve. Fill
 | Host / environment | Loading path |
 |---|---|
 | Codex or another host that reads `AGENTS.md` | Use repository-root `AGENTS.md`, which directs the agent to the shared rules. Codex's project discovery and `.agents/skills` discovery are separate. [S1, S2] Codex models, routing, and optional custom-agent files: `adapters/codex/`. [S14]-[S16] |
-| Grok Build | Reads root `AGENTS.md` and `CLAUDE.md` automatically. It also discovers the project's `.agents/skills/`, so copy the wrappers from `adapters/grok-build/` into `.grok/skills/` to keep both skills opt-in (they take priority and set `disable-model-invocation`). Grok models and user-configured effort routing: `adapters/grok-build/README.md`. [S17]-[S20] |
+| Grok Build | Reads root `AGENTS.md` and `CLAUDE.md` automatically. It also discovers the project's `.agents/skills/`; the bundle's root `.grok/skills/` wrappers take priority and set `disable-model-invocation`, which keeps both skills opt-in. The bundle's `.grok/` also overrides Grok's built-in `execute-plan` (which commits and pushes) and adds `ask` rules for history actions; see `adapters/grok-build/README.md`. Keep `.grok/` when installing. Grok models and user-configured effort routing: `adapters/grok-build/README.md`. [S17]-[S20] |
 | Claude Code | Use repository-root `CLAUDE.md`. Its `@` imports load the same entry point, baseline, and activation policy, plus the Claude-only delegation routing in `adapters/claude-code/MODEL-ROUTING.md`. Claude Code documents this bridge for `AGENTS.md`. [S3] Per-model settings (effort, thinking, API quirks): `adapters/claude-code/MODEL-NOTES.md`. |
 | Other model-powered IDE/custom agent | Configure the actual host to load `AGENTS.md`, or inject the generated context below into its project-instruction mechanism. Do not assume a host-specific filename or special tool exists. |
 | Chat-only interface or host without repository access | Supply `AGENT_CONTEXT.md` as text or an attachment through whatever context mechanism the host supports. Add relevant project files and explicitly requested skills. A local path alone is not its contents. |

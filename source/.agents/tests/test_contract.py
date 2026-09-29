@@ -143,7 +143,7 @@ class ContractTests(unittest.TestCase):
 
     def test_grok_and_codex_adapters(self):
         for name in ('think-like-fable', 'super-code'):
-            wrapper = (A / 'adapters/grok-build' / name / 'SKILL.md').read_text(encoding='utf-8')
+            wrapper = (A.parent / '.grok/skills' / name / 'SKILL.md').read_text(encoding='utf-8')
             with self.subTest(skill=name):
                 self.assertIn('disable-model-invocation: true', wrapper)
                 self.assertIn(f'name: {name}', wrapper)
@@ -162,6 +162,21 @@ class ContractTests(unittest.TestCase):
         reviewer = (A / 'adapters/codex/agents/reviewer.toml').read_text(encoding='utf-8')
         self.assertIn('sandbox_mode = "read-only"', reviewer)
         self.assertIn('Claude hosts only', (A / 'adapters/claude-code/MODEL-ROUTING.md').read_text(encoding='utf-8'))
+
+    def test_grok_project_config_asks_before_history_actions(self):
+        config = (A.parent / '.grok/config.toml').read_text(encoding='utf-8')
+        try:
+            import tomllib
+        except ImportError:  # Python < 3.11
+            tomllib = None
+        ask = tomllib.loads(config)['permission']['ask'] if tomllib else config
+        for rule in ('Bash(git commit*)', 'Bash(git push*)', 'Bash(git worktree add*)', 'Bash(gh pr create*)'):
+            self.assertIn(rule, ask)
+        for path in ('AGENT_RULES.md', 'AGENT_CONTEXT.md'):
+            self.assertIn('skills and plan executors built into the host', (A / path).read_text(encoding='utf-8'))
+        override = (A.parent / '.grok/skills/execute-plan/SKILL.md').read_text(encoding='utf-8')
+        self.assertIn('name: execute-plan', override)  # same name replaces Grok's bundled skill
+        self.assertIn('.agents/AGENT_RULES.md', override)
 
     def test_user_instruction_precedes_skill_guidance(self):
         for path in ('AGENT_RULES.md', 'AGENT_CONTEXT.md'):

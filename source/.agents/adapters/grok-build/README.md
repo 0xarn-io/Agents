@@ -6,6 +6,11 @@ your version with `grok inspect` and `tests/BEHAVIORAL_EVALS.md`.
 
 ## Loading
 
+Grok Build loads a project's `AGENTS.md`, `CLAUDE.md`, project skills, and `.grok/config.toml`
+only after the folder is trusted: accept the trust prompt on first launch, or run
+`/hooks-trust`. Until then none of this bundle applies. The grant is stored in
+`~/.grok/trusted_folders.toml`. `grok inspect` shows what loaded.
+
 Grok Build reads project rules from `AGENTS.md` and also from `CLAUDE.md` (plus
 `.grok/rules/*.md`, `.claude/rules/`, `.cursor/rules/`), walking from the repository root down
 to the working directory, with no size cap. In this repository it therefore loads both root
@@ -15,19 +20,41 @@ Claude hosts; Grok follows the notes below. Run `grok inspect` to see what was f
 
 Grok Build also discovers skills in the project's `.agents/skills/` (as well as
 `.grok/skills/` and the user-level skill folders), so both shared skills are listed in every
-session. The shared `SKILL.md` files stay vendor-neutral and carry no invocation flag, which
-leaves only the prose policy between a description match and an unrequested workflow.
-**Install the wrappers** so the opt-in is enforced by the host: a `.grok/skills/` skill takes
-priority over the same name in `.agents/skills/`, and the wrappers set
-`disable-model-invocation: true`:
+session. The shared `SKILL.md` files stay vendor-neutral and carry no invocation flag. The
+bundle therefore ships Grok wrappers at the repository root in `.grok/skills/<name>/SKILL.md`:
+they take priority over the same names in `.agents/skills/`, set
+`disable-model-invocation: true`, and delegate to the shared source. Installing the bundle
+installs them. If the project already has a `.grok/skills/` folder, merge rather than
+overwrite. Check with `grok inspect`.
 
-```sh
-mkdir -p .grok/skills/think-like-fable .grok/skills/super-code
-cp .agents/adapters/grok-build/think-like-fable/SKILL.md .grok/skills/think-like-fable/
-cp .agents/adapters/grok-build/super-code/SKILL.md .grok/skills/super-code/
-```
+## Built-in skills and git actions
 
-The wrappers delegate to the shared source. Merge rather than overwrite existing skills.
+Grok Build ships bundled skills. Its `execute-plan` triggers on requests like "execute the
+plan" and runs subagents in worktrees, commits, builds a branch stack, and pushes. In evals
+it did so even after reading `AGENT_RULES.md`. The bundle handles this in two layers:
+
+- `.grok/skills/execute-plan/SKILL.md` overrides the bundled skill (a project skill with the
+  same name wins). It executes the plan in the current working tree under the shared rules,
+  with no branches, worktrees, commits, or pushes unless the user asks. To get Grok's
+  branch-stack workflow back in a project, delete that folder.
+- `.grok/config.toml` adds `ask` rules for commit, push, merge, rebase, hard reset, stash, checkout, restore, clean, worktree
+  creation, and PR submission. In `auto` mode they make Grok ask before those commands;
+  without them the auto classifier allowed a commit. Grok Build 1.0.44 skips `ask` rules
+  under `--always-approve`/`bypassPermissions`, and they cannot stop the host itself from
+  creating subagent worktrees, which is why the skill override exists.
+
+A project `.grok/config.toml` can only set `[mcp_servers]`, `[plugins]`, and `[permission]`.
+To stop any other bundled skill from triggering, add it to `[skills] disabled` in your own
+`~/.grok/config.toml`. Merge with an existing project `.grok/` folder rather than overwrite.
+
+## Headless runs
+
+In `grok -p` with `--permission-mode dontAsk` (or plan mode), a shell command that matches no
+`--allow` rule cancels the whole session (`stop_reason: cancelled`), not just that call, so
+the final report is lost. For unattended runs, allow every command the task needs, for
+example `--allow 'Bash(python *)'`, or give exact file paths so the agent can use `read_file`
+instead of the shell. An agent that cannot run a check should report the check it skipped
+(see "Verification and reporting" in `AGENT_RULES.md`).
 
 ## Models
 

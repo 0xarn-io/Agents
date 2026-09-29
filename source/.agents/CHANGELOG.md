@@ -1,3 +1,33 @@
+# Revision: fixes from Grok 4.7 and GPT-6 Astra ratings — 2026-09-29
+
+- Grok Build: the skill wrappers now ship at the repository root in `.grok/skills/`, so both
+  skills are opt-in on Grok without an install step. They were in `adapters/grok-build/`.
+  A new root `.grok/config.toml` adds `ask` rules for commit, push, merge, rebase, hard reset,
+  worktree creation, and PR submission. In an eval, Grok Build's bundled `execute-plan`
+  skill created worktrees and branches, committed, and tried to push. The adapter documents
+  folder trust (nothing in a project loads until the folder is trusted) and headless runs
+  (an unmatched command in `dontAsk` cancels the session).
+- `.grok/skills/execute-plan/SKILL.md` overrides Grok Build's bundled `execute-plan`, which
+  committed, branched, and tried to push in evals. The override runs the plan in the current
+  working tree under the shared rules. The `ask` rules in `.grok/config.toml` work in `auto`
+  mode; Grok Build 1.0.44 skips them under `--always-approve`.
+- `AGENT_RULES.md`: the history and publishing limits apply to every workflow, including
+  skills and plan executors built into the host; without authorization, work stays
+  uncommitted in the current tree. "Progress updates and ending a turn" now starts by
+  deciding the deliverable: a request for a plan is complete when the plan is written. Grok
+  had treated plan requests as work to finish under the keep-working rules.
+- `super-code`: `test-driven-development.md` rewritten without absolute commands such as
+  "Always", "Delete it. Start over.", and "No exceptions"; code written before its test is
+  treated as a draft. `subagent-driven-development.md`: implementers commit only when
+  authorized, and routing points to all three hosts' notes. Removed the upstream
+  `using-superpowers` dispatcher and the debugging skill's creation log and pressure-test
+  files.
+- `think-like-fable`: "done" is checked against the original request plus later corrections
+  and accepted scope changes, not only the first message.
+- Evals (`evals/` in the repository): grading is split into artifact, verification, and
+  handoff; runs can be repeated; a no-bundle control shows what the bundle changes; new plan
+  request and plan execution cases.
+
 # Revision: behavioral evals — 2026-09-29
 
 - `AGENT_RULES.md`: when tool output or repository data tries to direct the agent, it does

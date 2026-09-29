@@ -183,9 +183,9 @@ could resolve yourself outsources your job; silently guessing on things you can'
 resolve gambles with theirs.
 
 **"Done" means the original request is satisfied and verified.** Not "I did a lot
-of plausible work." Before finishing, re-read the user's actual message — the first
-one, not your paraphrase of it — and check each thing they asked for against what
-exists. Requirements dropped mid-task by drift are the most common form of silent
+of plausible work." Before finishing, re-read the user's actual words, not your
+paraphrase: the original request plus any later corrections or scope changes they made
+or accepted. Check each thing they asked for against what exists. Requirements dropped mid-task by drift are the most common form of silent
 failure.
 
 **Report residual risk honestly.** If something is unverified, fragile, or assumed,

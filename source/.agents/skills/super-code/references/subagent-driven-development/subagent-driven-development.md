@@ -57,7 +57,7 @@ digraph process {
         "Dispatch implementer subagent (./implementer-prompt.md)" [shape=box];
         "Implementer subagent asks questions?" [shape=diamond];
         "Answer questions, provide context" [shape=box];
-        "Implementer subagent implements, tests, commits, self-reviews" [shape=box];
+        "Implementer subagent implements, tests, self-reviews (commits only if authorized)" [shape=box];
         "Write diff file, dispatch task reviewer subagent (./task-reviewer-prompt.md)" [shape=box];
         "Task reviewer reports spec ✅ and quality approved?" [shape=diamond];
         "Dispatch fix subagent for Critical/Important findings" [shape=box];
@@ -73,8 +73,8 @@ digraph process {
     "Dispatch implementer subagent (./implementer-prompt.md)" -> "Implementer subagent asks questions?";
     "Implementer subagent asks questions?" -> "Answer questions, provide context" [label="yes"];
     "Answer questions, provide context" -> "Dispatch implementer subagent (./implementer-prompt.md)";
-    "Implementer subagent asks questions?" -> "Implementer subagent implements, tests, commits, self-reviews" [label="no"];
-    "Implementer subagent implements, tests, commits, self-reviews" -> "Write diff file, dispatch task reviewer subagent (./task-reviewer-prompt.md)";
+    "Implementer subagent asks questions?" -> "Implementer subagent implements, tests, self-reviews (commits only if authorized)" [label="no"];
+    "Implementer subagent implements, tests, self-reviews (commits only if authorized)" -> "Write diff file, dispatch task reviewer subagent (./task-reviewer-prompt.md)";
     "Write diff file, dispatch task reviewer subagent (./task-reviewer-prompt.md)" -> "Task reviewer reports spec ✅ and quality approved?";
     "Task reviewer reports spec ✅ and quality approved?" -> "Dispatch fix subagent for Critical/Important findings" [label="no"];
     "Dispatch fix subagent for Critical/Important findings" -> "Write diff file, dispatch task reviewer subagent (./task-reviewer-prompt.md)" [label="re-review"];
@@ -109,9 +109,10 @@ interfaces, evidence, and authorization boundaries, not an entire conversation h
 
 Use the current model unless an actual model-selection capability and budget allow another.
 Choose based on task difficulty and observed reliability, not a claim that the cheapest
-model is always efficient. When the project has a routing policy (Claude hosts:
-`.agents/adapters/claude-code/MODEL-ROUTING.md`), follow it and set the model on every
-dispatch. Do not invent a model identifier or selector argument.
+model is always efficient. Set a model or effort only when the dispatch tool exposes that
+argument, and then follow the host's routing notes: Claude `.agents/adapters/claude-code/MODEL-ROUTING.md`,
+Codex `.agents/adapters/codex/README.md`, Grok Build `.agents/adapters/grok-build/README.md`.
+Do not invent a model identifier or selector argument.
 
 Give each brief a time budget when you have one ("about 20 minutes; report what you have
 by then"). Without a user-given deadline, add no time pressure: this project puts quality
@@ -127,7 +128,7 @@ tests. Re-run verification when reports are stale or insufficient.
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** Generate the review package (`scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
+**DONE:** If the task is uncommitted, write the working-tree diff (`git diff` plus new files) to a file and give the reviewer that path. Otherwise generate the review package (`scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
 
 **DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed to review.
 
@@ -296,7 +297,7 @@ Implementer: "Got it. Implementing now..."
   - Implemented install-hook command
   - Added tests, 5/5 passing
   - Self-review: Found I missed --force flag, added it
-  - Committed
+  - Left uncommitted (commits not authorized); diff ready
 
 [Run review-package, dispatch task reviewer with the printed path]
 Task reviewer: Spec ✅ - all requirements met, nothing extra.
@@ -313,7 +314,7 @@ Implementer:
   - Added verify/repair modes
   - 8/8 tests passing
   - Self-review: All good
-  - Committed
+  - Left uncommitted (commits not authorized); diff ready
 
 [Run review-package, dispatch task reviewer with the printed path]
 Task reviewer: Spec ❌:
@@ -373,7 +374,6 @@ Done!
 ## Red Flags
 
 **Never:**
-- Start implementation on main/master branch without explicit user consent
 - Skip task review, or accept a report missing either verdict (spec compliance AND task quality are both required)
 - Proceed with unfixed issues
 - Dispatch multiple implementation subagents in parallel (conflicts)

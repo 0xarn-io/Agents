@@ -25,38 +25,27 @@ Write the test first. Watch it fail. Write minimal code to pass.
 
 **Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
 
-**Violating the letter of the rules is violating the spirit of the rules.**
+## When to use
 
-## When to Use
+Use test-first for new behavior, bug fixes, and behavior changes where an automated test is
+practical. For refactoring, make sure tests cover the behavior before you change the code.
+Throwaway prototypes, generated code, and configuration changes usually get a different
+check: a parse or load check, a diff review, or a run of the affected path. Say which check
+you used. The user or project can set a different policy; follow it.
 
-**Always:**
-- New features
-- Bug fixes
-- Refactoring
-- Behavior changes
-
-**Exceptions (ask your human partner):**
-- Throwaway prototypes
-- Generated code
-- Configuration files
-
-Thinking "skip TDD just this once"? Stop. That's rationalization.
+"Skip the test just this once" is worth a second look. Most of the time the test is cheap
+and the skip is not.
 
 ## The core rule
 
-```
-No production code without a failing test first.
-```
+Write the failing test before the production code it covers.
 
-Write code before the test? Delete it. Start over.
-
-**No exceptions:**
-- Don't keep it as "reference"
-- Don't "adapt" it while writing tests
-- Don't look at it
-- Delete means delete
-
-Implement fresh from tests. Period.
+If you wrote code before a test, whether exploration or a first attempt, treat that code as
+a draft. Write the test next and watch it fail against the pre-change behavior: stash or
+revert your own draft, or check the test against the original code. Then bring the
+implementation back and let the test drive any changes. Rewrite the draft if the test shows
+it is wrong or hard to test. This applies only to your own new work in this task; never
+discard user or pre-existing changes.
 
 ## Red-Green-Refactor
 
@@ -192,9 +181,9 @@ Confirm:
 - Other tests still pass
 - Output pristine (no errors, warnings)
 
-**Test fails?** Fix code, not test.
+**Test fails?** Usually the code is wrong. If the test itself encodes the wrong expectation, fix the test and say why.
 
-**Other tests fail?** Fix now.
+**Other tests fail?** If your change broke them, fix that now. If they were already failing, confirm that against the original code, leave them, and report them.
 
 ### REFACTOR - Clean Up
 
@@ -239,13 +228,10 @@ Manual testing is ad-hoc. You think you tested everything but:
 
 Automated tests are systematic. They run the same way every time.
 
-**"Deleting X hours of work is wasteful"**
+**"Rewriting X hours of work is wasteful"**
 
-Sunk cost fallacy. The time is already gone. Your choice now:
-- Delete and rewrite with TDD (X more hours, high confidence)
-- Keep it and add tests after (30 min, low confidence, likely bugs)
-
-The "waste" is keeping code you can't trust. Working code without real tests is technical debt.
+You rarely need to. Keep the draft, write the test, and prove the test fails without the
+change. The waste is keeping code whose tests have never been shown to catch anything.
 
 **"TDD is dogmatic, being pragmatic means adapting"**
 
@@ -275,31 +261,24 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 | "I'll test after" | Tests passing immediately prove nothing. |
 | "Tests after achieve same goals" | Tests-after = "what does this do?" Tests-first = "what should this do?" |
 | "Already manually tested" | Ad-hoc ≠ systematic. No record, can't re-run. |
-| "Deleting X hours is wasteful" | Sunk cost fallacy. Keeping unverified code is technical debt. |
-| "Keep as reference, write tests first" | You'll adapt it. That's testing after. Delete means delete. |
-| "Need to explore first" | Fine. Throw away exploration, start with TDD. |
+| "Rewriting X hours is wasteful" | Keep the draft; prove the new test fails without it. |
+| "Keep as reference, write tests first" | Fine, if the test is shown to fail against the old behavior. |
+| "Need to explore first" | Fine. Treat the exploration as a draft and test it as above. |
 | "Test hard = design unclear" | Listen to test. Hard to test = hard to use. |
 | "TDD will slow me down" | TDD faster than debugging. Pragmatic = test-first. |
 | "Manual test faster" | Manual doesn't prove edge cases. You'll re-test every change. |
 | "Existing code has no tests" | You're improving it. Add tests for existing code. |
 
-## Red flags: start over
+## Red flags
 
-- Code before test
-- Test after implementation
-- Test passes immediately
-- Can't explain why test failed
-- Tests added "later"
-- Rationalizing "just this once"
-- "I already manually tested it"
-- "Tests after achieve the same purpose"
-- "It's about spirit not ritual"
-- "Keep as reference" or "adapt existing code"
-- "Already spent X hours, deleting is wasteful"
-- "TDD is dogmatic, I'm being pragmatic"
-- "This is different because..."
+- A new test passes on its first run
+- You can't explain why a test failed
+- Tests planned for "later"
+- "I already manually tested it" as the only evidence
+- "This is different because..." with no concrete reason
 
-**All of these mean: Delete code. Start over with TDD.**
+Each one means the tests have not yet shown they catch the problem. Go back to Verify RED:
+make the test fail against the old behavior, then make it pass.
 
 ## Example: Bug Fix
 
@@ -351,7 +330,7 @@ Before marking work complete:
 - [ ] Tests use real code (mocks only if unavoidable)
 - [ ] Edge cases and errors covered
 
-Can't check all boxes? You skipped TDD. Start over.
+Can't check a box? Close that gap, or say in the handoff which check is missing and why.
 
 ## When Stuck
 
@@ -366,7 +345,7 @@ Can't check all boxes? You skipped TDD. Start over.
 
 Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression.
 
-Never fix bugs without a test.
+Fix a bug without a regression test only when no practical test exists, and say so.
 
 ## Testing Anti-Patterns
 
@@ -375,11 +354,7 @@ When adding mocks or test utilities, read [testing-anti-patterns.md](testing-ant
 - Adding test-only methods to production classes
 - Mocking without understanding dependencies
 
-## Final Rule
+## Final rule
 
-```
-Production code → test exists and failed first
-Otherwise → not TDD
-```
-
-No exceptions without your human partner's permission.
+Production code should have a test that was seen to fail first. When that is not practical,
+say which check you used instead and why.
