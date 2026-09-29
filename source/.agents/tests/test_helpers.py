@@ -19,8 +19,9 @@ WRAPPERS = AGENTS / 'skills/super-code/references/subagent-driven-development/sc
 def posix_bash():
     """Bash able to run the POSIX wrappers, or None.
 
-    On Windows, System32\bash.exe is the WSL launcher, which runs Linux paths and fails
-    without a distribution; the wrappers target Git Bash or another native POSIX Bash.
+    On Windows, System32\bash.exe is the WSL launcher, which fails without a distribution,
+    and a bare 'bash' passed to subprocess is looked up in System32 before PATH. Return the
+    full path so the wrappers run under Git Bash or another native POSIX Bash.
     """
     path = shutil.which('bash')
     if path and os.name == 'nt' and Path(path).parent.name.lower() == 'system32':

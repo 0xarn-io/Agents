@@ -15,7 +15,10 @@
 - Codex adapter: use only the model IDs and effort values the installed host exposes;
   fallbacks when a pinned model is unavailable.
 - Windows: `tools/sdd.py` accepts in-repository paths spelled with 8.3 short names; tests read
-  files as UTF-8.
+  files as UTF-8; the Bash-wrapper test runs Bash by full path (a bare `bash` resolves to the
+  WSL launcher in System32).
+- CI runs the tests on Linux, Windows, and macOS (Python 3.9 and 3.13); pushing a `v*` tag
+  publishes the bundle as a release zip.
 - `README.md`, `tests/BEHAVIORAL_EVALS.md` (Grok loading case) updated; `AGENT_CONTEXT.md`
   regenerated. Details in `VALIDATION.md`.
 
