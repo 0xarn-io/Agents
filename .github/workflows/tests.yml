@@ -36,6 +36,9 @@ jobs:
       - name: Report failing tests as annotations
         if: failure()
         run: python ../.github/scripts/annotate_failures.py test-output.txt
+      - name: Eval grader tests
+        working-directory: evals
+        run: python -m unittest test_run_evals -v
       - name: AGENT_CONTEXT.md is up to date
         run: |
           python .agents/tools/export_context.py --output .agents/AGENT_CONTEXT.md

@@ -128,7 +128,7 @@ tests. Re-run verification when reports are stale or insufficient.
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** If the task is uncommitted, write the working-tree diff (`git diff` plus new files) to a file and give the reviewer that path. Otherwise generate the review package (`scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
+**DONE:** Generate the review package (`scripts/review-package PLAN_FILE BASE HEAD`, or `BASE WORKTREE` when the task is uncommitted, which adds staged, unstaged, and untracked files; from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
 
 **DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed to review.
 
@@ -174,10 +174,9 @@ final whole-branch review. When you fill a reviewer template:
   test hygiene, review method) — the constraints block is for what THIS
   project's spec demands.
 - Hand the reviewer its diff as a file: run this skill's
-  `scripts/review-package PLAN_FILE BASE HEAD` and pass the reviewer the file path
-  it prints (or, without bash: `git log --oneline`, `git diff --stat`,
-  and `git diff -U10` for the range, redirected to one uniquely named
-  file). The output never enters your own context, and the reviewer sees
+  `scripts/review-package PLAN_FILE BASE HEAD` (use `WORKTREE` instead of `HEAD` when
+  the work is uncommitted) and pass the reviewer the file path it prints (or,
+  without bash: `python .agents/tools/sdd.py review-package` with the same arguments). The output never enters your own context, and the reviewer sees
   the commit list, stat summary, and full diff with context in one Read
   call. Use the BASE you recorded before dispatching the implementer —
   never `HEAD~1`, which silently truncates multi-commit tasks.
@@ -196,8 +195,9 @@ final whole-branch review. When you fill a reviewer template:
   Do not dismiss the finding because the plan mandates it, and do not
   dispatch a fix that contradicts the plan without asking.
 - The final whole-branch review gets a package too: run
-  `scripts/review-package PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = the commit the
-  branch started from, using the actual agreed base branch, not a guessed branch name) and include the
+  `scripts/review-package PLAN_FILE MERGE_BASE HEAD`, or `MERGE_BASE WORKTREE` when any
+  of the work is uncommitted (MERGE_BASE = the commit the work started from, using the
+  actual agreed base branch, not a guessed branch name), and include the
   printed path in the final review dispatch, so the final reviewer reads
   one file instead of re-deriving the branch diff with git commands.
 - Every fix dispatch carries the implementer contract: the fix subagent
@@ -299,7 +299,7 @@ Implementer: "Got it. Implementing now..."
   - Self-review: Found I missed --force flag, added it
   - Left uncommitted (commits not authorized); diff ready
 
-[Run review-package, dispatch task reviewer with the printed path]
+[Run review-package with BASE WORKTREE, dispatch task reviewer with the printed path]
 Task reviewer: Spec ✅ - all requirements met, nothing extra.
   Strengths: Good test coverage, clean. Issues: None. Task quality: Approved.
 
@@ -316,7 +316,7 @@ Implementer:
   - Self-review: All good
   - Left uncommitted (commits not authorized); diff ready
 
-[Run review-package, dispatch task reviewer with the printed path]
+[Run review-package with BASE WORKTREE, dispatch task reviewer with the printed path]
 Task reviewer: Spec ❌:
   - Missing: Progress reporting (spec says "report every 100 items")
   - Extra: Added --json flag (not requested)
@@ -388,7 +388,8 @@ Done!
   dispatch prompt ("treat it as Minor at most") — the plan's example code is
   a starting point, not evidence that its weaknesses were chosen
 - Dispatch a task reviewer without a diff file — generate it first
-  (`scripts/review-package PLAN_FILE BASE HEAD`) and name the printed path in the
+  (`scripts/review-package PLAN_FILE BASE HEAD`, or `BASE WORKTREE` for uncommitted
+  work) and name the printed path in the
   prompt
 - Move to next task while the review has open Critical/Important issues
 - Skip or re-dispatch a task from a ledger label alone — check its plan identity,

@@ -211,6 +211,20 @@ Not part of task two.
         self.assertIn('+value = 3', text)
         self.assertIn('Committed changes only', text)
 
+    def test_review_package_worktree_includes_uncommitted_and_untracked(self):
+        self.change(2, 'fixture change one')
+        (self.root / 'app.py').write_text('value = 99\n')  # unstaged edit
+        (self.root / 'new_module.py').write_text('added = True\n')  # untracked file
+        before = self.git('status', '--porcelain').stdout
+        out = Path(self.call('review-package', self.plan, self.base, 'WORKTREE').stdout.strip())
+        text = out.read_text(encoding='utf-8')
+        self.assertIn('fixture change one', text)
+        self.assertIn('+value = 99', text)
+        self.assertIn('+added = True', text)
+        self.assertIn('new_module.py (untracked)', text)
+        self.assertNotIn('.agents-state', text)
+        self.assertEqual(self.git('status', '--porcelain').stdout, before)  # nothing staged or changed
+
     def test_invalid_or_reversed_review_revisions_fail(self):
         head = self.change()
         self.call('review-package', self.plan, head, self.base, code=2)

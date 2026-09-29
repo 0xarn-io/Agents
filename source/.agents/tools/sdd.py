@@ -341,6 +341,28 @@ def status(plan: Plan) -> tuple:
             "dirty": dirty, "all_current": all_current, "tasks": tasks}, (0 if all_current else 3)
 
 
+def worktree_package(plan: Plan, base: str) -> tuple:
+    """Review package from BASE to the working tree: commits since BASE plus staged, unstaged,
+    and untracked (not ignored) files. Nothing is staged or written to the repository."""
+    head = commit(plan.root, "HEAD")
+    if not ancestor(plan.root, base, head):
+        raise WorkflowError("BASE must be an ancestor of HEAD")
+    log = git(plan.root, "log", "--no-show-signature", "--format=%h %s", base + "..HEAD").stdout
+    stat = git(plan.root, "diff", "--no-ext-diff", "--no-textconv", "--stat", base, "--").stdout
+    diff = git(plan.root, "diff", "--no-ext-diff", "--no-textconv", "--binary", "-U10", base, "--").stdout
+    untracked = [f for f in git(plan.root, "ls-files", "--others", "--exclude-standard", "-z").stdout.split("\0")
+                 if f and STATE_DIR not in Path(f).parts]
+    for name in sorted(untracked):
+        # Exit status 1 only means the files differ.
+        diff += git(plan.root, "diff", "--no-index", "--no-ext-diff", "--binary", "-U10", "--",
+                    "/dev/null", name, check=False).stdout
+    text = (f"# Review package: {base}..WORKTREE (HEAD {head})\n\n"
+            "Commits since BASE plus staged, unstaged, and untracked files in the working tree.\n\n"
+            f"## Commits\n\n{log or '(none)'}\n## Files changed\n\n{stat}"
+            f"{''.join(f' {n} (untracked){chr(10)}' for n in sorted(untracked))}\n## Diff\n\n{diff}")
+    return text, f"review-{base}..worktree-{sha(text.encode('utf-8'))[:12]}.diff"
+
+
 def positive(value: str) -> int:
     if not re.fullmatch(r"[1-9][0-9]*", value):
         raise argparse.ArgumentTypeError("task number must be a positive integer without leading zeros")
@@ -376,6 +398,8 @@ def main(argv=None) -> int:
         elif args.command in ("task-brief", "review-package"):
             if args.command == "task-brief":
                 text, name = plan.brief(args.task), f"task-{args.task}-brief.md"
+            elif args.head == "WORKTREE":
+                text, name = worktree_package(plan, commit(plan.root, args.base))
             else:
                 base, head = commit(plan.root, args.base), commit(plan.root, args.head)
                 if not ancestor(plan.root, base, head):
@@ -384,7 +408,7 @@ def main(argv=None) -> int:
                 stat = git(plan.root, "diff", "--no-ext-diff", "--no-textconv", "--stat", base, head, "--").stdout
                 diff = git(plan.root, "diff", "--no-ext-diff", "--no-textconv", "--binary", "-U10", base, head, "--").stdout
                 text = (f"# Review package: {base}..{head}\n\n"
-                        "Committed changes only; inspect uncommitted and untracked files separately.\n\n"
+                        "Committed changes only; for uncommitted work use WORKTREE as HEAD.\n\n"
                         f"## Commits\n\n{log}\n## Files changed\n\n{stat}\n## Diff\n\n{diff}")
                 name = f"review-{base}..{head}.diff"
             plan.check_unchanged()

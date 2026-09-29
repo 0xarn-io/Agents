@@ -1,3 +1,15 @@
+# Revision: uncommitted reviews and stricter eval grading — 2026-09-29
+
+- `tools/sdd.py review-package PLAN BASE WORKTREE`: a review package for uncommitted work,
+  with commits since BASE plus staged, unstaged, and untracked files. It reads the working
+  tree only and names the file by content hash. `subagent-driven-development.md`,
+  `task-reviewer-prompt.md`, and `tools/README.md` use it wherever a task or branch may be
+  uncommitted, so a reviewer always sees the whole change.
+- Evals: verification counts only checks a shell actually started (not reading a test file,
+  not "command not found"); `ran_check` and `reported_unable` are separate. The grader also
+  covers merge, rebase, PR, and worktree commands, leftover branches and worktrees, and
+  handoff content. All runs were re-graded.
+
 # Revision: fixes from Grok 4.7 and GPT-6 Astra ratings — 2026-09-29
 
 - Grok Build: the skill wrappers now ship at the repository root in `.grok/skills/`, so both

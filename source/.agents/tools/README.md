@@ -47,7 +47,15 @@ python .agents/tools/sdd.py review-package docs/plans/example.md BASE HEAD
 Replace BASE and HEAD with the recorded commits; BASE must be an ancestor of HEAD.
 The output contains the complete commit list, file summary, and net committed diff with
 extended context. It handles multi-commit tasks; do not substitute `HEAD~1` for the real base.
-Uncommitted/staged/new files are not in that package and must be reviewed separately.
+For uncommitted work, pass `WORKTREE` as HEAD:
+
+```sh
+python .agents/tools/sdd.py review-package docs/plans/example.md BASE WORKTREE
+```
+
+That package adds staged, unstaged, and untracked (not ignored) files since BASE. It reads
+the working tree only: nothing is staged or committed. Its file name includes a content
+hash, so a later package after further edits never collides with an earlier one.
 External diff/text-conversion drivers are disabled for these Git diff calls.
 
 ## Completion receipts and resume checks
@@ -105,7 +113,7 @@ the Python entry point without Bash. Set `PYTHON` to a Python executable path wh
 |---|---|
 | `sdd-workspace` | `sdd-workspace PLAN_FILE` (plan is now required) |
 | `task-brief` | `task-brief PLAN_FILE TASK_NUMBER [OUTFILE]` |
-| `review-package` | `review-package PLAN_FILE BASE HEAD [OUTFILE]` (plan is now required) |
+| `review-package` | `review-package PLAN_FILE BASE HEAD\|WORKTREE [OUTFILE]` (plan is now required; `WORKTREE` adds staged, unstaged, and untracked files) |
 
 All wrappers live under `skills/super-code/references/subagent-driven-development/scripts/`.
 No old no-plan fallback remains, because it would recreate shared-ledger ambiguity.

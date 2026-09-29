@@ -93,7 +93,9 @@ The release workflow runs the full test matrix first and publishes only if it pa
 On 2026-09-29, Claude Opus 5.5 (Claude Code), Grok 4.7 (Grok Build), and GPT-6 Astra (Codex)
 each reviewed the bundle read-only in their own host. They went through four rounds and all
 three signed off "good for all". The rounds are recorded in
-[`VALIDATION.md`](source/.agents/VALIDATION.md).
+[`VALIDATION.md`](source/.agents/VALIDATION.md). After the behavioral evals below and the
+fixes they led to, Grok 4.7 rated the bundle 9.6/10 and GPT-6 Astra 9.7/10, and both signed
+off "good for all" again.
 
 The same day, [`evals/`](evals/README.md) ran 9 behavioral cases headless in each tool, on
 Claude Opus 5.5, Sonnet 5.5, GPT-6 Astra, and Grok 4.7: 120 runs in throwaway repositories

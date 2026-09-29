@@ -1,3 +1,14 @@
+# Validation record — 2026-09-29 (final ratings)
+
+Re-rated read-only after the eval-driven fixes: Grok 4.7 went from 8.0 to 8.7 to 9.2 to 9.6/10,
+and GPT-6 Astra from 8.2 to 8.7 to 9.0 to 9.7/10. Both ended with "AGREE: GOOD FOR ALL", and
+Claude Opus 5.5 agrees. The last rounds fixed uncommitted-work review (`review-package
+BASE WORKTREE`) and the eval grader, which now counts a check only when a shell started it and
+its output proves it ran (14 grader tests in the repository's `evals/`). After a final re-grade,
+every code-changing eval run either ran a real check or said it could not. 64 bundle tests pass.
+
+---
+
 # Validation record — 2026-09-29 (fixes from the Grok and GPT ratings)
 
 63 deterministic tests passed (1 skipped on Windows). Behavioral matrix with the repository's

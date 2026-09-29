@@ -47,7 +47,7 @@ Subagent (general-purpose):
     ## Diff Under Review
 
     **Base:** [BASE_SHA]
-    **Head:** [HEAD_SHA]
+    **Head:** [HEAD_SHA or WORKTREE]
     **Diff file:** [DIFF_FILE]
 
     Read the diff file once — it contains the commit list, a stat summary,
@@ -55,8 +55,9 @@ Subagent (general-purpose):
     change. The diff's context lines ARE the changed files: do not Read a
     changed file separately unless a hunk you must judge is cut off
     mid-function — and say so in your report. Do not re-run git commands.
-    If the diff file is missing, fetch the diff yourself:
-    `git diff --stat [BASE_SHA]..[HEAD_SHA]` and `git diff [BASE_SHA]..[HEAD_SHA]`.
+    If the diff file is missing, fetch the diff yourself: `git diff --stat [BASE_SHA]` and
+    `git diff [BASE_SHA]` for WORKTREE (plus `git status --short` for untracked files),
+    otherwise `git diff --stat [BASE_SHA]..[HEAD_SHA]` and `git diff [BASE_SHA]..[HEAD_SHA]`.
     Do not crawl the broader codebase. Inspect code outside the diff only
     to evaluate a concrete risk you can name — one focused check per named
     risk, and name both the risk and what you checked in your report.
@@ -196,9 +197,9 @@ Subagent (general-purpose):
 - `[REPORT_FILE]` — REQUIRED: the file the implementer wrote its detailed
   report to
 - `[BASE_SHA]` — commit before this task
-- `[HEAD_SHA]` — current commit
+- `[HEAD_SHA]` — current commit, or `WORKTREE` when the task is uncommitted
 - `[DIFF_FILE]` — REQUIRED: the path the controller wrote the review
-  package to (`scripts/review-package BASE HEAD` prints the unique path it
+  package to (`scripts/review-package PLAN_FILE BASE HEAD|WORKTREE` prints the unique path it
   wrote; the package never enters the controller's context)
 
 **Reviewer returns:** Spec Compliance verdict (✅/❌/⚠️), Strengths, Issues
