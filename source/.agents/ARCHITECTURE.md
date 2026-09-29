@@ -11,9 +11,7 @@ Project goal, users, subsystem responsibilities, and protected/out-of-scope area
 
 ## Existing documentation
 
-The supplied bundle identifies `/input` as the location of initial AGV documentation.
-That is a project-specific absolute path; verify its availability. Do not create it or
-assume it exists on another host. Update the location here when the project owner supplies it.
+Record where the project's requirements, design documents, and manuals live. Not recorded.
 
 ## Toolchain and supported environments
 

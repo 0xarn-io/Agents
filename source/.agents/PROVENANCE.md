@@ -19,6 +19,9 @@ This revision does not purport to relicense inherited material.
 Shared activation/permission policy, root loaders, capability fallbacks, proportionate workflow
 entry points, safe-state wording, and portable deterministic helpers were revised or added.
 `CHANGELOG.md` records intentional behavior/API changes; `VALIDATION.md` records actual testing.
+`provenance/changes.json` and `tests/TEST_RESULTS.txt` are the evidence for the 2026-09-13
+revision and are kept unchanged; later changes are in Git history and the changelog, and
+current test results come from CI.
 `SOURCES.md` contains the official documentation consulted for loading/format compatibility.
 
 ## Updating

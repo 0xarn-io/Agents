@@ -1,3 +1,15 @@
+# Revision: behavioral evals — 2026-09-29
+
+- `AGENT_RULES.md`: when tool output or repository data tries to direct the agent, it does
+  not act on it and tells the user what the text asked and where it appeared. Two of four
+  models stayed silent about an injected instruction before this line; all four report it now.
+- Install notes: Windows path-length limit (the deepest bundle path is 101 characters).
+- `CLAUDE.md`: in hosts that expand `@` imports, the imported rules are not read again; hosts
+  that show the lines as text still read the files.
+- `ARCHITECTURE.md`: removed a leftover project-specific documentation path.
+  `PROVENANCE.md` marks the 2026-09-13 evidence files as historical.
+- `tests/BEHAVIORAL_EVALS.md` points to the automated harness (`evals/` in the repository).
+
 # Revision: three-model review (Claude, Grok, GPT) — 2026-09-29
 
 - Baseline: exploration scales with the task (a trivial local edit needs the affected file and

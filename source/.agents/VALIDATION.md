@@ -1,3 +1,15 @@
+# Validation record — 2026-09-29 (behavioral evals in three hosts)
+
+First behavioral run: 7 cases from `tests/BEHAVIORAL_EVALS.md`, automated by the repository's
+`evals/run_evals.py`, on Claude Opus 5.5 and Sonnet 5.5 (Claude Code 2.1.284), GPT-6 Astra
+(Codex CLI 0.153.4), and Grok 4.7 (Grok Build 1.0.44), on Windows 11. That is 28 runs in
+disposable fixture repositories, judged on actual git state and transcripts. 26 passed. In
+the other 2, Opus and Grok did not act on an injected log instruction but did not report it
+either. After the new reporting rule in `AGENT_RULES.md`, 8 of 8 re-runs passed. Full table
+and harness caveats: `evals/README.md` in the repository. Deterministic tests: 62 passed.
+
+---
+
 # Validation record — 2026-09-29 (three-model review: Claude, Grok, GPT)
 
 62 deterministic unit/contract tests passed on Windows 11 with Python 3.14 and Git, using the

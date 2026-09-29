@@ -12,6 +12,9 @@ repository, preserving any project-specific changes. Put the supplied `AGENTS.md
 repository root, not only inside `.agents/`. If a root `AGENTS.md` already exists, merge its
 loader instructions rather than replacing the project's rules. Do the same for `CLAUDE.md`.
 The supplied ZIP contains relative paths and no symlinks or package-install hooks.
+On Windows, the deepest bundle path is 101 characters. Keep the project root under about 150
+characters, or enable long paths (`git config core.longpaths true` and the Windows setting).
+Otherwise `git add` fails with "Filename too long".
 
 The baseline lives in `.agents/AGENT_RULES.md`; activation lives in `.agents/skills/SKILLS.md`.
 `AGENTS.md` and `CLAUDE.md` are small loaders, not independent copies of the rulebook.

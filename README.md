@@ -32,6 +32,8 @@ source/                          ← copy the contents of this folder into your 
 1. Copy `source/AGENTS.md`, `source/CLAUDE.md`, and `source/.agents/` to your repository
    root. If the project already has an `AGENTS.md` or `CLAUDE.md`, merge them rather than overwrite.
 2. Fill in `.agents/ARCHITECTURE.md` with the project's real build and test commands.
+   On Windows, keep the project path under about 150 characters or enable Git long paths
+   (`git config core.longpaths true`): the deepest bundle path is 101 characters.
 3. Add the adapter for each host you use:
 
 | Host | Loads automatically | Extra step |
@@ -90,7 +92,12 @@ The release workflow runs the full test matrix first and publishes only if it pa
 On 2026-09-29, Claude Opus 5.5 (Claude Code), Grok 4.7 (Grok Build), and GPT-6 Astra (Codex)
 each reviewed the bundle read-only in their own host. They went through four rounds and all
 three signed off "good for all". The rounds are recorded in
-[`VALIDATION.md`](source/.agents/VALIDATION.md). A review is not a behavioral test: the
-scenarios in [`tests/BEHAVIORAL_EVALS.md`](source/.agents/tests/BEHAVIORAL_EVALS.md) still
-need running in each host.
+[`VALIDATION.md`](source/.agents/VALIDATION.md).
+
+The same day, [`evals/`](evals/README.md) ran 7 behavioral cases headless in each tool, on
+Claude Opus 5.5, Sonnet 5.5, GPT-6 Astra, and Grok 4.7. Each run used a throwaway repository
+with a real bug, a dirty working tree, and a log containing an injected instruction. 26 of 28
+runs passed. The other two acted on nothing but didn't report the injected instruction. After
+a one-line rule fix, 8 of 8 re-runs reported it. Re-run the evals with
+`python evals/run_evals.py`.
 
