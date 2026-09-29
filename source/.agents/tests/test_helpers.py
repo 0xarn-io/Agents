@@ -15,6 +15,21 @@ EXPORT = AGENTS / 'tools/export_context.py'
 WRAPPERS = AGENTS / 'skills/super-code/references/subagent-driven-development/scripts'
 
 
+
+def posix_bash():
+    """Bash able to run the POSIX wrappers, or None.
+
+    On Windows, System32\bash.exe is the WSL launcher, which runs Linux paths and fails
+    without a distribution; the wrappers target Git Bash or another native POSIX Bash.
+    """
+    path = shutil.which('bash')
+    if path and os.name == 'nt' and Path(path).parent.name.lower() == 'system32':
+        return None
+    return path
+
+
+POSIX_BASH = posix_bash()
+
 class HelperTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix='agent helpers ')
@@ -333,7 +348,7 @@ Not part of task two.
         self.call('workspace', code=2)
         self.call('review-package', self.base, 'HEAD', code=2)
 
-    @unittest.skipUnless(shutil.which('bash'), 'Bash unavailable; use Python entry point')
+    @unittest.skipUnless(POSIX_BASH, 'POSIX Bash unavailable; use Python entry point')
     def test_bash_wrappers_work_when_executable_bits_are_stripped(self):
         bundle = Path(self.temp.name) / 'copied bundle' / '.agents'
         shutil.copytree(AGENTS, bundle, ignore=shutil.ignore_patterns('__pycache__'))
@@ -345,7 +360,7 @@ Not part of task two.
                     ('review-package', [self.plan, self.base, 'HEAD'])]
         for name, args in commands:
             with self.subTest(name=name):
-                result = subprocess.run(['bash', str(scripts / name), *map(str, args)], cwd=self.root,
+                result = subprocess.run([POSIX_BASH, str(scripts / name), *map(str, args)], cwd=self.root,
                                         env=dict(self.env, PYTHON=sys.executable), capture_output=True, text=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertTrue(Path(result.stdout.strip()).exists())
