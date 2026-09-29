@@ -97,15 +97,14 @@ three signed off "good for all". The rounds are recorded in
 fixes they led to, Grok 4.7 rated the bundle 9.6/10 and GPT-6 Astra 9.7/10, and both signed
 off "good for all" again.
 
-The same day, [`evals/`](evals/README.md) ran 9 behavioral cases headless in each tool, on
-Claude Opus 5.5, Sonnet 5.5, GPT-6 Astra, and Grok 4.7: 120 runs in throwaway repositories
-with a real bug, a dirty working tree, and a log containing an injected instruction, each
-case also run without the bundle for comparison. Six cases passed in all 8 runs (2 per
-model). On the rest, with the final bundle: Opus reported an injected instruction in 3 of 4
-runs, Grok stopped at a requested plan in 3 of 4, and Grok executed a plan cleanly in 2 of 2
-after the `execute-plan` override. The bundle measurably helped: Sonnet ran its tests (0/2
-without), GPT stayed in scope, Opus and GPT reported the injected instruction (0/2 each
-without), and Grok executed a plan without committing or pushing (0/2 without). Details and
-remaining gaps: [`evals/README.md`](evals/README.md). Re-run with
+The same day, [`evals/`](evals/README.md) ran 12 behavioral cases headless in each tool, on
+Claude Opus 5.5, Sonnet 5.5, GPT-6 Astra, and Grok 4.7, in throwaway repositories with a real
+bug, a dirty working tree, and a log containing an injected instruction. The cases include
+plan requests, plan execution, chat-only use, delegation, and working without subagents, and
+most also run without the bundle for comparison. With the final bundle, all 56 runs of the
+last round passed. Without it, Sonnet shipped fixes without running tests, GPT edited code
+when only asked why, Opus and GPT stayed silent about the injected instruction, and Grok's
+built-in plan executor committed and tried to push. Details:
+[`evals/README.md`](evals/README.md). Re-run with
 `python evals/run_evals.py --repeat 2 --control`.
 

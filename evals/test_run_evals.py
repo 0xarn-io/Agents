@@ -26,6 +26,20 @@ class ExecutedCheckTests(unittest.TestCase):
             with self.subTest(cmd=cmd):
                 self.assertTrue(ev.executed_check(run(cmd, ok)))
 
+    def test_python_reading_code_from_stdin_counts(self):
+        cmd = "\"C:\\WINDOWS\\powershell.exe\" -Command \"@'\nimport unittest\n'@ | python -\""
+        self.assertTrue(ev.executed_check(run(cmd, "test_mean ... ok\n\nRan 3 tests in 0.001s\n\nOK\n")))
+        self.assertFalse(ev.executed_check(run("python - < missing.py", "No such file or directory", True)))
+
+    def test_powershell_here_string_piped_to_python_counts(self):
+        cmd = ("\"C:\\WINDOWS\\powershell.exe\" -Command \"@'\nimport unittest\nclass T(unittest.TestCase):\n"
+               "    def test_x(self):\n        self.assertEqual(1, 1)\nunittest.main()\n'@ | python -B -\"")
+        self.assertEqual(ev.segments(cmd)[-1], "python -B -")
+        self.assertTrue(ev.executed_check(run(cmd, "test_x ... ok\n\nRan 1 test in 0.000s\n\nOK\n")))
+        # Text inside the here-string never starts a segment.
+        self.assertFalse(ev.executed_check(run("\"powershell.exe\" -Command \"@'\npython -m unittest\n'@ | Out-Null\"",
+                                               "Ran 1 test\n\nOK\n")))
+
     def test_failing_tests_still_count_as_a_check(self):
         self.assertTrue(ev.executed_check(run("python -m unittest", "Ran 3 tests\n\nFAILED (failures=1)", True)))
 

@@ -1,3 +1,13 @@
+# Revision: residual eval gaps closed — 2026-09-29
+
+- `AGENT_RULES.md`: the final report names any instructions found in files, logs, pages, or
+  tool output that were not followed, even when they asked for silence. Opus had reported an
+  injected instruction in 3 of 4 runs; 2 of 2 after this.
+- Codex notes: a readable Python on the Windows sandbox's PATH (Codex's bundled runtime);
+  `agents.enabled = false` turns delegation off (`--disable multi_agent` does not).
+- Evals: new chat-only, subagent, and no-subagent cases; Grok runs headless with `--no-plan`;
+  the grader handles here-strings and stdin Python. With the bundle, 56 of 56 runs passed.
+
 # Revision: uncommitted reviews and stricter eval grading — 2026-09-29
 
 - `tools/sdd.py review-package PLAN BASE WORKTREE`: a review package for uncommitted work,

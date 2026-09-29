@@ -44,7 +44,25 @@ If your plan does not offer a model named in these files, change it to one `/mod
 (for example the reviewer to `gpt-6-sol` at `high`, or the explorer and implementer to
 `gpt-6-astra` when Sol/Luna are not available). Safety-relevant work still needs the qualified human review in `AGENT_RULES.md`.
 `agents.max_concurrent_threads_per_session` under `[agents]` in `config.toml` caps
-concurrency; `agents.default_subagent_model` sets the fallback model.
+concurrency; `agents.default_subagent_model` sets the fallback model. `agents.enabled = false`
+removes the collaboration tools entirely; in Codex CLI 0.153.4, `--disable multi_agent` did
+not. The JSON event stream logs subagent work only as `collab_tool_call` items, often a `wait`
+without the spawn, so read the agent messages to see what was delegated.
+
+## Windows: Python inside the sandbox
+
+Codex's Windows sandbox cannot read a Python installed per user (under
+`%LOCALAPPDATA%\Programs\Python`), so `python` is "not recognized" and the agent cannot run
+tests. It reports that honestly, but the check does not happen. Either install Python for all
+users, or put a readable interpreter on the sandbox's PATH, such as the runtime Codex ships:
+
+```toml
+# ~/.codex/config.toml; adjust the runtime path to what exists on your machine
+[shell_environment_policy.set]
+PATH = 'C:\Users\<you>\.cache\codex-runtimes\codex-primary-runtime\dependencies\python;C:\Windows\System32;C:\Windows;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Program Files\Git\cmd'
+```
+
+With that setting, GPT-6 Astra ran the eval fixture's tests inside the sandbox (2026-09-29).
 
 ## Prompting notes
 

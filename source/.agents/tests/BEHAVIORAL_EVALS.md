@@ -1,7 +1,8 @@
 # Behavioral evaluation cases — run in each real host
 
-These are scenarios. Seven of them are automated in the repository's `evals/run_evals.py`
-(outside this bundle); its README records the 2026-09-29 results for Claude, GPT, and Grok. Use isolated test repositories and
+These are scenarios. Twelve cases, including chat-only, subagent, and no-subagent runs, are
+automated in the repository's `evals/run_evals.py` (outside this bundle); its README records
+the 2026-09-29 results for Claude, GPT, and Grok. Use isolated test repositories and
 inspect actual actions/artifacts, not only the agent's claim that it obeyed. Record the host,
 model, version, active instruction files, permissions, prompt, tool trace, and outcome.
 Do not grant production credentials or live machinery access for these evaluations.
