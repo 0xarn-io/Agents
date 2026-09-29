@@ -100,5 +100,7 @@ python -m unittest discover -s .agents/tests -p 'test_*.py' -v
 
 Tests use temporary repositories and never commit to the target project. They create test
 commits only inside those disposable fixtures. See `VALIDATION.md` for actual results and
-unverified environments. Behavioral evaluation cases are separate and are not a claim of
-live cross-model testing. See `CHANGELOG.md` and `PROVENANCE.md` for the revision history.
+unverified environments. The behavioral cases were run live on 2026-09-29 in Claude Code
+(Opus 5.5, Sonnet 5.5), Codex (GPT-6 Astra), and Grok Build (Grok 4.7) with the repository's
+`evals/run_evals.py`; results are in `VALIDATION.md`. Re-run them after changing hosts,
+models, or rules. See `CHANGELOG.md` and `PROVENANCE.md` for the revision history.

@@ -1,4 +1,28 @@
-# Validation record — 2026-09-29 (final ratings)
+# Current status (read this first)
+
+As of 2026-09-29 (release v2026.09.29.4):
+
+- **Live behavioral evals: run.** 12 cases in real headless sessions of Claude Code 2.1.284
+  (Opus 5.5, Sonnet 5.5), Codex CLI 0.153.4 (GPT-6 Astra), and Grok Build 1.0.44 (Grok 4.7),
+  on Windows 11, with and without the bundle. In the final round, 56 of 56 runs with the bundle
+  passed. Harness and full results: `evals/` in the repository.
+- **Live reviews: run.** Grok 4.7 and GPT-6 Astra reviewed the bundle in their own hosts over
+  several rounds; final ratings Grok 9.0/10 and GPT-6 Astra 9.3/10, both "good for all".
+- **Deterministic tests:** 64 bundle tests and 16 eval-grader tests, run in CI on Linux,
+  Windows, and macOS with Python 3.9 and 3.13.
+- **Not established:** other models and hosts, other operating systems for the live evals,
+  larger or real projects (the fixture is small, 2 runs per case), the browser companion and
+  Graphviz output, and physical machinery.
+
+Records below are in reverse date order. Older records describe what was true when they were
+written; statements they make that later work overturned are marked "Superseded".
+
+---
+
+# Validation record — 2026-09-29 (ratings after the eval fixes)
+
+(Asked again from scratch after v2026.09.29.4, without anchoring on these scores: Grok 4.7
+9.0/10, GPT-6 Astra 9.3/10, both "AGREE: GOOD FOR ALL". See "Current status".)
 
 Re-rated read-only after the eval-driven fixes: Grok 4.7 went from 8.0 to 8.7 to 9.2 to 9.6/10,
 and GPT-6 Astra from 8.2 to 8.7 to 9.0 to 9.7/10. Both ended with "AGREE: GOOD FOR ALL", and
@@ -56,7 +80,8 @@ Grok corrected one of its own round-1 host claims in round 3 after checking its 
 guide; the disputed claims were removed rather than restated. Headless Grok runs in plan mode
 end with `stop_reason: cancelled` when the model calls the shell tool; give it exact paths so
 it can use `read_file` only. These are reviews, not behavioral tests: the cases in
-`tests/BEHAVIORAL_EVALS.md` still need running in each host.
+`tests/BEHAVIORAL_EVALS.md` still need running in each host. (They were run later the same
+day; see the records above.)
 
 ---
 
@@ -64,7 +89,8 @@ it can use `read_file` only. These are reviews, not behavioral tests: the cases 
 
 62 deterministic unit/contract tests passed (61 from the 2026-09-28 revision + 1 for the
 Sonnet 5.5 rules). `AGENT_CONTEXT.md` regenerated and matches canonical sources. No live
-Sonnet 5.5 session was run; behavior is from [S21].
+Sonnet 5.5 session was run; behavior is from [S21]. (Superseded later the same day: Sonnet 5.5
+ran in every behavioral eval round.)
 
 ---
 
@@ -77,6 +103,8 @@ wrappers and Codex agent files, and user-over-skill precedence). A mutation chec
 (reinstating "MANDATORY" in the TDD reference and allowing fable in the routing file) made
 the two relevant tests fail as intended. The three Codex agent files parse as TOML with the
 required fields. `AGENT_CONTEXT.md` was regenerated and matches the canonical sources.
+
+> Superseded on 2026-09-29 by live sessions in all three hosts; see "Current status" at the top.
 
 Not executed: no live Claude Code, Codex, Grok Build, or API sessions with any model.
 Model and host behavior is taken from vendor documentation in `SOURCES.md` [S8]-[S20].
@@ -118,6 +146,9 @@ Optional format checks used the environment's YAML parser; the shipped helpers a
 require only Python's standard library, Git, and Bash for the wrapper-specific test.
 
 ## Not executed or established
+
+> Superseded on 2026-09-29: live sessions were then run in Claude Code, Codex, and Grok Build,
+> and the tests run on Windows, macOS, and Linux in CI. See "Current status" at the top.
 
 No live Claude Code, Grok, GPT/Codex, or other provider-model sessions were run. Host loading
 was checked against the official documentation in SOURCES.md, not proven by a live client.

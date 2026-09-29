@@ -65,7 +65,7 @@ From `source/`:
 python -m unittest discover -s .agents/tests -p "test_*.py" -v
 ```
 
-62 tests (1 skipped on Windows) passed on 2026-09-29 on Windows 11 with Python 3.14. After
+64 tests (1 skipped on Windows) passed on 2026-09-29 on Windows 11 with Python 3.14. After
 editing `AGENT_RULES.md`, `skills/SKILLS.md`, or `CAPABILITIES.md`, regenerate the export:
 
 ```bash
