@@ -1,0 +1,42 @@
+name: release
+
+# Push a tag such as v2026.09.29 to test the bundle and publish it as a GitHub release.
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml
+
+  release:
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build bundle archive
+        run: |
+          name="agents-bundle-${GITHUB_REF_NAME}"
+          git archive --format=zip --output "${name}.zip" "${GITHUB_REF_NAME}:source"
+          sha256sum "${name}.zip" > "${name}.zip.sha256"
+          unzip -l "${name}.zip" | tail -1
+      - name: Release notes from CHANGELOG
+        run: |
+          awk 'NR==1 {print; next} /^# Revision:/ {exit} {print}' source/.agents/CHANGELOG.md > notes.md
+          cat >> notes.md <<'MD'
+
+          ## Install
+          Unzip into your project root: it contains `AGENTS.md`, `CLAUDE.md`, and `.agents/`.
+          Merge rather than overwrite existing `AGENTS.md`/`CLAUDE.md`. Per-host steps are in
+          `.agents/README.md`; Grok Build users should copy the wrappers from
+          `.agents/adapters/grok-build/` into `.grok/skills/`.
+          MD
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "agents-bundle-${GITHUB_REF_NAME}.zip" "agents-bundle-${GITHUB_REF_NAME}.zip.sha256" \
+            --title ".agents bundle ${GITHUB_REF_NAME}" --notes-file notes.md --verify-tag

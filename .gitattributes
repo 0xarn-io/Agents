@@ -1,0 +1,2 @@
+# Keep instruction files and scripts LF on every platform (see also source/.agents/.gitattributes).
+* text=auto eol=lf

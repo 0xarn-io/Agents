@@ -1,0 +1,36 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.9", "3.13"]
+    defaults:
+      run:
+        working-directory: source
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Unit and contract tests
+        run: python -m unittest discover -s .agents/tests -p "test_*.py" -v
+      - name: AGENT_CONTEXT.md is up to date
+        shell: bash
+        run: |
+          python .agents/tools/export_context.py --output .agents/AGENT_CONTEXT.md
+          git diff --exit-code -- .agents/AGENT_CONTEXT.md
